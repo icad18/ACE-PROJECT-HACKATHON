@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warkop ACE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Warkop ACE</h1>
+        <p>Tempat Ngopi Santai dan Makan Enak</p>
+    </header>
+
+    <main>
+        <section id="menu">
+            <h2>Menu Kami</h2>
+            <div class="menu-category">
+                <h3>Makanan</h3>
+                <div id="food-menu" class="menu-items">
+                    <!-- Food items will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3>Minuman</h3>
+                <div id="drink-menu" class="menu-items">
+                    <!-- Drink items will be dynamically loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Item Details Modal -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modal-item-name"></h2>
+            <p id="modal-item-description"></p>
+            <p id="modal-item-price"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

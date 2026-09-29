@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # =============================================================================
+  # Langflow OSS — Orchestration Layer (MCP #1 target: Bob → Langflow)
+  # UI: http://localhost:7860
+  # =============================================================================
+  langflow:
+    image: langflowai/langflow:latest
+    container_name: ace_langflow
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_SECRET_KEY=${LANGFLOW_SECRET_KEY:-change-me-in-production}
+      - LANGFLOW_AUTO_LOGIN=${LANGFLOW_AUTO_LOGIN:-false}
+      - LANGFLOW_SUPERUSER=${LANGFLOW_SUPERUSER:-langflow}
+      - LANGFLOW_SUPERUSER_PASSWORD=${LANGFLOW_SUPERUSER_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - langflow_data:/app/langflow
+      - ./langflow/flows:/app/flows:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # =============================================================================
+  # GitHub MCP Server — GitHub Bridge (MCP #2 target: Langflow → GitHub)
+  # Endpoint: http://localhost:8080
+  # Docs: https://github.com/github/github-mcp-server
+  # =============================================================================
+  github-mcp:
+    image: ghcr.io/github/github-mcp-server:latest
+    container_name: ace_github_mcp
+    ports:
+      - "8080:8080"
+    environment:
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+    # MVP toolset: context, repos, pull_requests only (least privilege)
+    command: ["--toolsets", "context,repos,pull_requests"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  # =============================================================================
+  # ACE MCP Server — ACE Tool Layer (file ops, git ops, shell, evidence)
+  # Endpoint: http://localhost:8765
+  # Started via: ace mcp (or docker compose up ace-mcp)
+  # =============================================================================
+  ace-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: ace_mcp_server
+    ports:
+      - "8765:8765"
+    environment:
+      - MCP_AUTH_TOKEN=${MCP_AUTH_TOKEN}
+      - ACE_DATA_DIR=/data
+    volumes:
+      - ./:/workspace:rw
+      - ace_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # =============================================================================
+  # PostgreSQL — Reference marketplace database (tidak dipakai oleh MVP)
+  # Dipertahankan untuk referensi backend/ dan frontend-web/ yang sudah ada
+  # =============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: marketplace_db
+    environment:
+      POSTGRES_DB: marketplace
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d marketplace"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - marketplace
+
+volumes:
+  langflow_data:
+  ace_data:
+  postgres_data:

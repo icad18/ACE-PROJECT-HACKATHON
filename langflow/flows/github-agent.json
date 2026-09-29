@@ -1,0 +1,11 @@
+{
+  "id": "github-agent-placeholder",
+  "name": "GitHub Agent (Placeholder)",
+  "description": "Langflow flow for Gemini Agent that reads and writes GitHub via MCP. Import this file into Langflow after setup. This is a placeholder — the actual flow will be built and exported in Sub-Task 4.",
+  "version": "0.1.0",
+  "data": {
+    "nodes": [],
+    "edges": []
+  },
+  "_note": "Replace this file with the exported flow JSON from Langflow after completing Sub-Task 4 setup."
+}

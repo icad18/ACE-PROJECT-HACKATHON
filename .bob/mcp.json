@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+
+    "ace-tools": {
+      "type": "http",
+      "url": "${ACE_MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer ${MCP_AUTH_TOKEN}"
+      },
+      "description": "ACE Tool Layer — file ops, git ops, shell, test runner, evidence collector exposed as MCP tools"
+    }
+  }
+}

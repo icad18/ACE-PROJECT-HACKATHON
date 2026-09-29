@@ -1,0 +1,33 @@
+;; ==============================================================================
+;; ACE macOS Seatbelt Sandbox Profile (default.sb)
+;; Restricts file access strictly to project workspace and temporary files.
+;; ==============================================================================
+(version 1)
+(deny default)
+
+;; Allow basic process execution and standard library imports
+(allow process-exec)
+(allow process-fork)
+(allow sysctl-read)
+
+;; Allow read-only access to system binaries, frameworks, and system Python
+(allow file-read*
+    (subpath "/System")
+    (subpath "/usr")
+    (subpath "/bin")
+    (subpath "/sbin")
+    (subpath "/Library/Frameworks")
+    (subpath "/opt/homebrew")
+    (subpath "/private/etc")
+    (subpath "/dev")
+)
+
+;; Allow read/write access to /tmp, /private/tmp, and /var/folders for build caches
+(allow file-read* file-write*
+    (subpath "/tmp")
+    (subpath "/private/tmp")
+    (subpath "/var/folders")
+)
+
+;; Outbound network restricted by default (unless required for dependencies)
+(allow network-outbound (to tcp "*:80") (to tcp "*:443"))
